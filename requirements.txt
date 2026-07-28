@@ -1,0 +1,26 @@
+videosdk-agents==1.0.25
+videosdk-plugins-google==1.0.25
+python-dotenv
+django
+google-genai
+djangorestframework
+django-cors-headers
+pgvector
+psycopg2-binary
+langchain
+langchain-text-splitters
+langchain-postgres
+google-genai
+pypdf
+google-auth
+djangorestframework
+djangorestframework-simplejwt
+google-generativeai
+chromadb
+sentence-transformers
+PyPDF2
+python-docx
+pandas
+openpyxl   # for Excel .xlsx support
+xlrd       # for older .xls support
+chardet    # for encoding detection

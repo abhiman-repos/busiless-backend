@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: ai_customer_success
+    restart: always
+    environment:
+      POSTGRES_DB: ai_customer_success
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5431:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # ---------- New services ----------
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: chromadb
+    restart: always
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+      - ANONYMIZED_TELEMETRY=False
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  django:
+    build: .
+    container_name: django_app
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - chromadb
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/ai_customer_success
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - REDIS_URL=redis://redis:6379/0
+      - GOOGLE_API_KEY: ${GOOGLE_API_KEY}   # Set this in your .env file
+    volumes:
+      - .:/app
+      - /app/__pycache__   # optional: avoid local cache issues
+      - media_files:/app/media
+    command: python manage.py runserver 0.0.0.0:8000
+
+volumes:
+  postgres_data:
+  chroma_data:
+  redis_data:
+  media_files:

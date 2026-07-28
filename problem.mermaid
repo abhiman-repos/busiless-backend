@@ -1,0 +1,26 @@
+flowchart TD
+    O[Order intent detected] --> Ask1[Ask: Client Name]
+    Ask1 --> Ask2[Ask: Product / Service Name]
+    Ask2 --> Ask3[Ask: Quantity]
+    Ask3 --> Ask4[Ask: Delivery Address]
+    Ask4 --> Confirm[Read back details for confirmation]
+    Confirm --> ConfirmOK{Customer confirms?}
+    ConfirmOK -- No, corrects --> Ask1
+    ConfirmOK -- Yes --> Ask5{Payment Mode?}
+
+    Ask5 -- Cash on Delivery --> COD[Create order: status = confirmed_cod]
+    Ask5 -- Online --> Online[Create order: status = pending_payment]
+
+    Online --> GenLink[Generate payment link via gateway]
+    GenLink --> SendWA[Send link to client's WhatsApp]
+    SendWA --> EndCall[Agent ends call — does not wait on line]
+    EndCall --> Wait{Payment webhook result}
+    Wait -- Failed / Timeout --> Reminder[Send WhatsApp reminder or mark order failed]
+    Wait -- Success --> GenTrack[Generate Tracking ID]
+
+    COD --> GenTrack
+    GenTrack --> GenInvoice[Generate structured invoice]
+    GenInvoice --> SendConfirm[Send tracking ID + order link via WhatsApp]
+    SendConfirm --> LogConv[Log full conversation: number, name, subject, transcript]
+    Reminder --> LogConv
+    LogConv --> End([End])
