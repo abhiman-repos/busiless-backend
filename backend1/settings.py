@@ -23,6 +23,7 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 WHATSAPP_ACCESS_TOKEN = os.getenv("WHATSAPP_ACCESS_TOKEN")
 WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
 WHATSAPP_VERIFY_TOKEN = os.getenv("WHATSAPP_VERIFY_TOKEN")
+CHROMA_DB_PATH = os.getenv('CHROMA_DB_PATH', './chroma_db')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "accounts",
+    "rag"
 
 ]
 

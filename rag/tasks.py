@@ -1,9 +1,12 @@
 # rag/tasks.py
+from celery import shared_task
 from .embedding import embed_texts
 from rag.chroma_client import collection
 from .models import TrainingFile
-import google.generativeai as genai
+from google import genai
 from rag.extractors import extract_text_from_file
+from rag.utils import chunk_text
+
 
 
 def embed_texts_in_batches(texts, batch_size=100):
@@ -47,6 +50,29 @@ def process_file(training_file_id):
             documents=chunks
         )
 
+        tf.status = 'completed'
+        tf.save()
+    except Exception as e:
+        tf.status = 'failed'
+        tf.save()
+        raise e
+    
+    
+@shared_task
+def process_uploaded_file(file_id):
+    tf = TrainingFile.objects.get(id=file_id)
+    try:
+        content = extract_text_from_file(tf.file.path)
+        chunks = chunk_text(content, chunk_size=500, overlap=50)
+        embeddings = embed_texts(chunks)  # batched with Gemini
+        ids = [f"{tf.id}_{i}" for i in range(len(chunks))]
+        metadatas = [{"file_id": tf.id, "user_id": tf.user.id, "chunk_index": i} for i in range(len(chunks))]
+        collection.add(
+            ids=ids,
+            embeddings=embeddings,
+            metadatas=metadatas,
+            documents=chunks
+        )
         tf.status = 'completed'
         tf.save()
     except Exception as e:

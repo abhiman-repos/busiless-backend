@@ -1,10 +1,11 @@
 # rag/embedding.py
-import google.generativeai as genai
+from google import genai
 from django.conf import settings
 from typing import List, Union
+import os
 
 # Configure the Gemini client
-genai.configure(api_key=settings.GEMINI_API_KEY)
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 # Use the latest embedding model
 # Options: "models/text-embedding-004" (recommended), "models/embedding-001"

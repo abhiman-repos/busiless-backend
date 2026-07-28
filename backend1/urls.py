@@ -15,4 +15,5 @@ urlpatterns = [
     path('api/', include(router.urls)), 
     path('api/', include(router.urls)),
     path('api/', include(router.urls)),               # /api/business/products/ (CRUD)
+    path('api/training/', include('rag.urls')),
 ]

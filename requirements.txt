@@ -1,5 +1,3 @@
-videosdk-agents==1.0.25
-videosdk-plugins-google==1.0.25
 python-dotenv
 django
 google-genai
@@ -15,7 +13,7 @@ pypdf
 google-auth
 djangorestframework
 djangorestframework-simplejwt
-google-generativeai
+google-genai
 chromadb
 sentence-transformers
 PyPDF2
@@ -24,3 +22,4 @@ pandas
 openpyxl   # for Excel .xlsx support
 xlrd       # for older .xls support
 chardet    # for encoding detection
+celery
