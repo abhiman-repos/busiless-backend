@@ -46,11 +46,11 @@ services:
       - chromadb
       - redis
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/ai_customer_success
-      - CHROMA_HOST=chromadb
-      - CHROMA_PORT=8000
-      - REDIS_URL=redis://redis:6379/0
-      - GOOGLE_API_KEY: ${GOOGLE_API_KEY}   # Set this in your .env file
+        DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ai_customer_success
+        CHROMA_HOST: chromadb
+        CHROMA_PORT: 8000
+        REDIS_URL: redis://redis:6379/0
+        GEMINI_API_KEY: ${GEMINI_API_KEY}  # Set this in your .env file
     volumes:
       - .:/app
       - /app/__pycache__   # optional: avoid local cache issues

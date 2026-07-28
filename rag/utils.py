@@ -10,7 +10,7 @@ def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list:
         overlap (int): Number of characters to overlap between chunks.
 
     Returns:
-        list: List of text chunks.
+        list: list of text chunks.
     """
     if len(text) <= chunk_size:
         return [text]

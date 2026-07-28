@@ -6,19 +6,36 @@ from .models import TrainingFile
 from google import genai
 from rag.extractors import extract_text_from_file
 from rag.utils import chunk_text
+from google import genai
+import os
+
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+
+EMBEDDING_MODEL = "gemini-embedding-001"
 
 
+def embed_texts_in_batches(
+    texts: list[str],
+    batch_size: int = 100,
+) -> list[list[float]]:
+    """
+    Generate embeddings for a list of texts in batches.
+    Returns a list of embedding vectors.
+    """
+    all_embeddings: list[list[float]] = []
 
-def embed_texts_in_batches(texts, batch_size=100):
-    all_embeddings = []
     for i in range(0, len(texts), batch_size):
-        batch = texts[i:i+batch_size]
-        result = genai.embed_content(
-            model="gemini-embedding-2",
-            content=batch,
-            task_type="retrieval_document"
+        batch = texts[i:i + batch_size]
+
+        response = client.models.embed_content(
+            model=EMBEDDING_MODEL,
+            contents=batch,
         )
-        all_embeddings.extend(result['embedding'])
+
+        all_embeddings.extend(
+            embedding.values for embedding in response.embeddings
+        )
+
     return all_embeddings
 
 def process_file(training_file_id):

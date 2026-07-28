@@ -1,27 +1,83 @@
 # rag/llm.py
+
 from google import genai
+import os
+import json
 
-def generate_answer_with_gemini(question: str, context: str) -> str:
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+
+MODEL_NAME = "gemini-3.6-flash"
+
+
+def generate_answer_with_gemini(
+    question: str,
+    context: str = None,
+    custom_prompt: str = None,
+    tools_data: dict = None,
+):
     """
-    Generate an answer using Gemini, based on the provided context.
+    Generate an answer using Gemini.
+
+    Parameters
+    ----------
+    question : User's question
+    context : RAG context from ChromaDB
+    custom_prompt : Optional complete prompt
+    tools_data : Live data from backend APIs
+                 Example:
+                 {
+                     "products": [...],
+                     "customers": [...],
+                     "orders": [...]
+                 }
     """
-    # Choose a model – Gemini 1.5 Flash is fast and cheap
-    model = genai.GenerativeModel('gemini-1.5-flash')
 
-    prompt = f"""You are a helpful assistant that answers questions based ONLY on the provided context.
-If the answer is not present in the context, say "I don't have enough information about that."
+    if custom_prompt:
+        prompt = custom_prompt
 
-Context:
-{context}
+    else:
+        prompt = """
+You are GoCyn AI Customer Success Assistant.
 
-Question: {question}
+You answer using:
 
-Answer:"""
+1. Retrieved knowledge (RAG)
+2. Live business data (Tools)
+
+Rules:
+- Use the provided tool data whenever available.
+- Use the context when relevant.
+- Never invent data.
+- If information is unavailable, clearly say so.
+- Format lists as bullet points.
+"""
+
+        if context:
+            prompt += f"\n\n## Knowledge Base\n{context}"
+
+        if tools_data:
+            prompt += (
+                "\n\n## Live Business Data\n"
+                + json.dumps(tools_data, indent=2)
+            )
+
+        prompt += f"""
+
+## User Question
+
+{question}
+
+## Answer
+"""
 
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+        )
+
         return response.text.strip()
+
     except Exception as e:
-        # Log the error and return a user-friendly message
-        print(f"Gemini API error: {e}")
-        return "Sorry, I encountered an error while generating the answer. Please try again later."
+        print(e)
+        return "Sorry, I encountered an error while generating the answer."

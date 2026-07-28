@@ -1,46 +1,43 @@
-# rag/embedding.py
+from typing import List
 from google import genai
-from django.conf import settings
-from typing import List, Union
 import os
 
-# Configure the Gemini client
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
-# Use the latest embedding model
-# Options: "models/text-embedding-004" (recommended), "models/embedding-001"
-EMBEDDING_MODEL = "models/text-embedding-004"
+EMBEDDING_MODEL = "gemini-embedding-001"
+
 
 def embed_text(text: str) -> List[float]:
     """
-    Embed a single text string using Gemini.
+    Embed a single document.
     """
-    result = genai.embed_content(
+    response = client.models.embed_content(
         model=EMBEDDING_MODEL,
-        content=text,
-        task_type="retrieval_document"  # good for RAG documents
+        contents=text,
     )
-    return result['embedding']
+
+    return response.embeddings[0].values
+
 
 def embed_texts(texts: List[str]) -> List[List[float]]:
     """
-    Embed multiple texts in a single batch call (more efficient).
-    Gemini supports up to 100 texts per batch.
+    Embed multiple documents.
     """
-    result = genai.embed_content(
+    response = client.models.embed_content(
         model=EMBEDDING_MODEL,
-        content=texts,
-        task_type="retrieval_document"
+        contents=texts,
     )
-    return result['embedding']
+
+    return [embedding.values for embedding in response.embeddings]
+
 
 def embed_query(text: str) -> List[float]:
     """
-    Embed a user query (use 'retrieval_query' task type for better results).
+    Embed a search query.
     """
-    result = genai.embed_content(
+    response = client.models.embed_content(
         model=EMBEDDING_MODEL,
-        content=text,
-        task_type="retrieval_query"
+        contents=text,
     )
-    return result['embedding']
+
+    return response.embeddings[0].values
