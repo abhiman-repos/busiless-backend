@@ -2,7 +2,7 @@
 from django.urls import path
 from accounts.auth.views import profile, update_company
 from accounts.auth.services import google_login
-from accounts.views import Product
+from accounts.views import Product, OrderViewSet
 
 urlpatterns = [
     path("google-login/", google_login, name="google-login"),

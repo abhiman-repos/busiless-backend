@@ -26,3 +26,14 @@ class TrainingFile(models.Model):
     class Meta:
         # enforce per-user unique filenames if desired
         unique_together = ('user', 'name')
+        
+class ChatSession(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    intent = models.CharField(max_length=50)
+
+    state = models.CharField(max_length=50)
+
+    data = models.JSONField(default=dict)
+
+    updated_at = models.DateTimeField(auto_now=True)

@@ -6,7 +6,11 @@ import json
 
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
-MODEL_NAME = "gemini-3.6-flash"
+MODELS = [
+    "gemini-3.6-flash",
+    "gemini-3.5-flash",
+    "gemini-2.5-flash",
+]
 
 
 def generate_answer_with_gemini(
@@ -27,7 +31,6 @@ def generate_answer_with_gemini(
                  Example:
                  {
                      "products": [...],
-                     "customers": [...],
                      "orders": [...]
                  }
     """
@@ -37,7 +40,7 @@ def generate_answer_with_gemini(
 
     else:
         prompt = """
-You are GoCyn AI Customer Success Assistant.
+You are Customer Success Assistant.
 
 You answer using:
 
@@ -70,14 +73,19 @@ Rules:
 ## Answer
 """
 
-    try:
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt,
-        )
+    last_error = None
 
-        return response.text.strip()
+    for model in MODELS:
+        try:
+            response = client.models.generate_content(
+                model=model,
+                contents=prompt,
+            )
 
-    except Exception as e:
-        print(e)
-        return "Sorry, I encountered an error while generating the answer."
+            return response.text.strip()
+
+        except Exception as e:
+            print(f"{model} failed: {e}")
+            last_error = e
+
+    raise last_error

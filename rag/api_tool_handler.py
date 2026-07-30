@@ -39,21 +39,21 @@ def call_tool_and_answer(question: str, tool_name: str, request) -> str:
 
     # Build a prompt that asks Gemini to answer the question based on the data.
     prompt = f"""
-You are an AI assistant that answers questions based solely on the following business data.
+    You are an AI assistant that answers questions based solely on the following business data.
 
-Data (in JSON format):
-{data_text}
+    Data (in JSON format):
+    {data_text}
 
-Question:
-{question}
+    Question:
+    {question}
 
-Instructions:
-- Answer the question using only the data provided.
-- If the answer is not in the data, say "I don't have enough information about that."
-- Be concise and natural.
+    Instructions:
+    - Answer the question using only the data provided.
+    - If the answer is not in the data, say "I don't have enough information about that."
+    - Be concise and natural.
 
-Answer:
-"""
+    Answer:
+    """
     # Use Gemini to generate the final answer
     answer = generate_answer_with_gemini(question, prompt)  # but we need to modify the function to accept custom prompt
 

@@ -74,10 +74,7 @@ class Order(models.Model):
         null=True,                         # allow null temporarily during migration
         blank=True
     )
-    # Remove these three fields:
-    # client_name = models.CharField(...)
-    # contact_number = models.CharField(...)
-    # delivery_address = models.TextField()
+    delivery_address = models.TextField()
     payment_mode = models.CharField(max_length=50)
     status = models.CharField(max_length=20, default="pending")
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)

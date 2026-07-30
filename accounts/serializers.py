@@ -2,7 +2,20 @@ from rest_framework import serializers
 from accounts.models import User, Company, Product, Order, OrderItem, Customer
 
 
+class CustomerSerializer(serializers.ModelSerializer):
+    # Optional: include the customer's orders
+    orders = serializers.StringRelatedField(many=True, read_only=True)  # or use OrderSerializer
 
+    class Meta:
+        model = Customer
+        fields = ['id', 'name', 'phone', 'email', 'address', 'notes', 'orders', 'created_at']
+        read_only_fields = ['id', 'created_at']
+        
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ["id", "product", "product_name", "quantity", "unit_price", "total"]
+        
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
@@ -47,32 +60,25 @@ class ProductSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "user", "created_at"]
 
-class OrderItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = ["id", "product", "product_name", "quantity", "unit_price", "total"]
 
-class OrderItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = ["id", "product", "product_name", "quantity", "unit_price", "total"]
+
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
+    customer = CustomerSerializer(read_only=True)
 
     class Meta:
         model = Order
         fields = [
-            "id", "client_name", "contact_number", "delivery_address",
-            "total_price", "payment_mode", "status", "items", "created_at"
+            "id",
+            "customer",
+            "delivery_address",
+            "total_price",
+            "payment_mode",
+            "status",
+            "items",
+            "created_at",
         ]
         read_only_fields = ["id", "user", "total_price", "created_at"]
 
-class CustomerSerializer(serializers.ModelSerializer):
-    # Optional: include the customer's orders
-    orders = serializers.StringRelatedField(many=True, read_only=True)  # or use OrderSerializer
 
-    class Meta:
-        model = Customer
-        fields = ['id', 'name', 'phone', 'email', 'address', 'notes', 'orders', 'created_at']
-        read_only_fields = ['id', 'created_at']
